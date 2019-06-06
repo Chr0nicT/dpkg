@@ -120,9 +120,11 @@ void checkpath(void) {
     BACKEND,
     /* Mac OS X uses dyld (Mach-O) instead of ld.so (ELF), and does not have
      * an ldconfig. */
-#if defined(__APPLE__) && defined(__MACH__)
-    "update_dyld_shared_cache",
-#elif defined(__GLIBC__) || defined(__UCLIBC__) || \
+//#if defined(__APPLE__) && defined(__MACH__)
+//   "update_dyld_shared_cache",
+//#elif defined(__GLIBC__) || defined(__UCLIBC__) || \
+
+#if defined(__GLIBC__) || defined(__UCLIBC__) || \
       defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
     "ldconfig",
 #endif
@@ -143,7 +145,7 @@ void checkpath(void) {
   }
 
   if (warned)
-    forcibleerr(FORCE_BAD_PATH,
+    forcibleerr(fc_badpath,
                 P_("%d expected program not found in PATH or not executable\n%s",
                    "%d expected programs not found in PATH or not executable\n%s",
                    warned),
@@ -182,7 +184,7 @@ ignore_depends_possi(struct deppossi *possi)
 bool
 force_depends(struct deppossi *possi)
 {
-  return in_force(FORCE_DEPENDS) ||
+  return fc_depends ||
          ignore_depends_possi(possi) ||
          ignore_depends(possi->up->up);
 }
@@ -190,7 +192,7 @@ force_depends(struct deppossi *possi)
 bool
 force_breaks(struct deppossi *possi)
 {
-  return in_force(FORCE_BREAKS) ||
+  return fc_breaks ||
          ignore_depends_possi(possi) ||
          ignore_depends(possi->up->up);
 }
@@ -198,7 +200,7 @@ force_breaks(struct deppossi *possi)
 bool
 force_conflicts(struct deppossi *possi)
 {
-  return in_force(FORCE_CONFLICTS);
+  return fc_conflicts;
 }
 
 void clear_istobes(void) {
